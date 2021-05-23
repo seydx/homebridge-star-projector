@@ -64,13 +64,13 @@ function StarProjector(log, config, api) {
 
           device.dps = {
             powerState: 20,
-            mode: 20,
-            rotation: 20,
+            mode: 21,
+            rotation: 101,
             scene: 25,
-            colorState: 20,
-            color: 20,
-            laserState: 20,
-            laserBrightness: 20,
+            colorState: 103,
+            color: 24,
+            laserState: 102,
+            laserBrightness: 22,
             ...device.dps,
           };
 

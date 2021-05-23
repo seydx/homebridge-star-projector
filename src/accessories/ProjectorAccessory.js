@@ -189,9 +189,9 @@ class ProjectorAccessory {
     }
   }
 
-  handleColor(value, fromScene) {
+  handleColor(value) {
     if (this.lightbulbColorService) {
-      Logger.debug(`Incoming color event: ${value} - From scene: ${fromScene}`);
+      Logger.debug(`Incoming color event: ${value}`);
       const color = ColorUtils.convertColorFromTuyaToHomeKit(value);
 
       this.lightbulbColorService.getCharacteristic(this.api.hap.Characteristic.Hue).updateValue(color.hue);
