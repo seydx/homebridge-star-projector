@@ -1,0 +1,306 @@
+{
+  "pluginAlias": "StarProjector",
+  "pluginType": "platform",
+  "singular": true,
+  "customUi": false,
+  "footerDisplay": "For documentation please see [GitHub repository](https://github.com/SeydX/homebridge-star-projector)",
+  "schema": {
+    "name": {
+      "title": "Name",
+      "type": "string",
+      "default": "StarProjector",
+      "description": "Name for the log"
+    },
+    "debug": {
+      "title": "Debug",
+      "type": "boolean",
+      "description": "Enables additional output in the log"
+    },
+    "projectors": {
+      "type": "array",
+      "items": {
+        "title": "Projectors",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "required": true,
+            "description": "Projector Accessory name"
+          },
+          "tuyaId": {
+            "title": "Tuya ID",
+            "type": "string",
+            "description": "Tuya ID / API Key",
+            "required": true
+          },
+          "tuyaKey": {
+            "title": "Tuya Key",
+            "type": "string",
+            "description": "Tuya Key / API Secret",
+            "required": true
+          },
+          "manufacturer": {
+            "name": "Manufacturer",
+            "type": "string",
+            "placeholder": "Tuya",
+            "description": "Set the manufacturer name for display in the Home app"
+          },
+          "model": {
+            "name": "Model",
+            "type": "string",
+            "placeholder": "Projector",
+            "description": "Set the model for display in the Home app"
+          },
+          "serialNumber": {
+            "name": "Serial Number",
+            "type": "string",
+            "placeholder": "SerialNumber",
+            "description": "Set the serial number for display in the Home app"
+          },
+          "color": {
+            "name": "Color",
+            "type": "boolean",
+            "description": "If your projector offers customizable colors, enable this to expose an additional Lightbulb Accessory to control it via HomeKit"
+          },
+          "laser": {
+            "name": "Laser",
+            "type": "boolean",
+            "description": "If your projector also offers a laser beam, enable this to expose an additional Lightbulb Accessory to control it via HomeKit"
+          },
+          "starRotation": {
+            "name": "Star Rotation",
+            "type": "boolean",
+            "description": "If your projector also offers a customizable star rotation, enable this to expose an additional Fan Accessory to control it via HomeKit"
+          },
+          "dps": {
+            "title": "DPS",
+            "type": "object",
+            "properties": {
+              "powerState": {
+                "name": "Power",
+                "type": "integer",
+                "description": "Custom DPS value for power state"
+              },
+              "laserState": {
+                "name": "Laser State",
+                "type": "integer",
+                "description": "Custom DPS value for laser state"
+              },
+              "colorState": {
+                "name": "Color State",
+                "type": "integer",
+                "description": "Custom DPS value for color state"
+              },
+              "laserBrightness": {
+                "name": "Laser Brightness",
+                "type": "integer",
+                "description": "Custom DPS value for laser brightness"
+              },
+              "color": {
+                "name": "Color",
+                "type": "integer",
+                "description": "Custom DPS value for color adjustment"
+              },
+              "rotation": {
+                "name": "Rotation",
+                "type": "integer",
+                "description": "Custom DPS value for rotation"
+              },
+              "scene": {
+                "name": "Scene",
+                "type": "integer",
+                "description": "Custom DPS value for scene"
+              },
+              "mode": {
+                "name": "Mode",
+                "type": "integer",
+                "description": "Custom DPS value for current mode"
+              }
+            }
+          },
+          "scenes": {
+            "title": "Scenes",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "active": {
+                  "title": "Active",
+                  "type": "boolean",
+                  "description": "If enabled, a new Switch Accessory will be exposed to HomeKit"
+                },
+                "name": {
+                  "title": "Name",
+                  "type": "string",
+                  "description": "Name of the scene for the Switch Accessory",
+                  "required": true,
+                  "condition": {
+                    "functionBody": "try { return model.projectors[arrayIndices[0]].scenes[arrayIndices[1]].active } catch(e){ return false }"
+                  }
+                },
+                "mode": {
+                  "title": "Flash Mode",
+                  "type": "string",
+                  "description": "Color flash mode",
+                  "oneOf": [
+                    {
+                      "title": "Flash",
+                      "enum": ["FLASH"]
+                    },
+                    {
+                      "title": "Breath",
+                      "enum": ["BREATH"]
+                    }
+                  ],
+                  "condition": {
+                    "functionBody": "try { return model.projectors[arrayIndices[0]].scenes[arrayIndices[1]].active } catch(e){ return false }"
+                  }
+                },
+                "rotation": {
+                  "title": "Rotation",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100,
+                  "description": "Star Rotation",
+                  "condition": {
+                    "functionBody": "try { return model.projectors[arrayIndices[0]].scenes[arrayIndices[1]].active && model.projectors[arrayIndices[0]].scenes[arrayIndices[1]].mode } catch(e){ return false }"
+                  }
+                },
+                "colors": {
+                  "title": "Colors",
+                  "type": "array",
+                  "items": {
+                    "title": "Color",
+                    "type": "string",
+                    "oneOf": [
+                      {
+                        "title": "Red",
+                        "enum": ["RED"]
+                      },
+                      {
+                        "title": "Blue",
+                        "enum": ["BLUE"]
+                      },
+                      {
+                        "title": "Green",
+                        "enum": ["GREEN"]
+                      },
+                      {
+                        "title": "Yellow",
+                        "enum": ["YELLOW"]
+                      },
+                      {
+                        "title": "Orange",
+                        "enum": ["ORANGE"]
+                      },
+                      {
+                        "title": "Purple",
+                        "enum": ["PURPLE"]
+                      },
+                      {
+                        "title": "Cyan",
+                        "enum": ["CYAN"]
+                      }
+                    ]
+                  },
+                  "condition": {
+                    "functionBody": "try { return model.projectors[arrayIndices[0]].scenes[arrayIndices[1]].active } catch(e){ return false }"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "layout": [
+    "name",
+    "debug",
+    {
+      "type": "section",
+      "title": "Projectors",
+      "expandable": true,
+      "expanded": true,
+      "orderable": false,
+      "items": [
+        {
+          "key": "projectors",
+          "type": "array",
+          "orderable": false,
+          "buttonText": "Add Projector",
+          "items": [
+            "projectors[].name",
+            "projectors[].tuyaId",
+            "projectors[].tuyaKey",
+            {
+              "key": "projectors[]",
+              "type": "section",
+              "title": "Branding",
+              "expandable": true,
+              "expanded": false,
+              "orderable": false,
+              "items": ["projectors[].manufacturer", "projectors[].model", "projectors[].serialNumber"]
+            },
+            {
+              "key": "projectors[]",
+              "title": "Extras",
+              "expandable": true,
+              "expanded": false,
+              "orderable": false,
+              "items": ["projectors[].color", "projectors[].laser", "projectors[].starRotation"]
+            },
+            {
+              "key": "projectors[].scenes",
+              "type": "section",
+              "title": "Scenes",
+              "expandable": true,
+              "expanded": false,
+              "orderable": false,
+              "buttonText": "Add Scene",
+              "items": [
+                {
+                  "key": "projectors[].scenes[]",
+                  "items": [
+                    "projectors[].scenes[].active",
+                    "projectors[].scenes[].name",
+                    "projectors[].scenes[].mode",
+                    "projectors[].scenes[].rotation",
+                    {
+                      "key": "projectors[].scenes[].colors",
+                      "type": "section",
+                      "expandable": true,
+                      "expanded": false,
+                      "orderable": false,
+                      "buttonText": "Add Color",
+                      "items": ["projectors[].scenes[].colors[]"]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "key": "projectors[].dps",
+              "type": "section",
+              "title": "Advanced",
+              "expandable": true,
+              "expanded": false,
+              "orderable": false,
+              "items": [
+                "projectors[].dps.powerState",
+                "projectors[].dps.mode",
+                "projectors[].dps.rotation",
+                "projectors[].dps.scene",
+                "projectors[].dps.colorState",
+                "projectors[].dps.color",
+                "projectors[].dps.laserState",
+                "projectors[].dps.laserBrightness"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

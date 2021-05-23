@@ -1,0 +1,59 @@
+{
+  "bridge": {
+      ...
+  },
+  "accessories": [
+      ...
+  ],
+  "platforms": [
+    {
+      "name": "StarProjector",
+      "debug": true,
+      "projectors": [
+          {
+              "name": "Star Projector Livingroom",
+              "tuyaId": "asdsadsafasvasfsfs",
+              "tuyaKey": "12w31231ascasdqasd"
+          },
+          {
+            "name": "Star Projector Bedroom",
+            "tuyaId": "asdsadsafasvasfsfs",
+            "tuyaKey": "12w31231ascasdqasd",
+            "manufacturer": "Suppou",
+            "model": "Smart Projector",
+            "serialNumber": "1234567890",
+            "color": true,
+            "laser": true,
+            "starRotation": true,
+            "dps": {
+                "powerState": 20,
+                "laserState": 102,
+                "colorState": 103,
+                "laserBrightness": 22,
+                "color": 24,
+                "rotation": 101,
+                "scene": 25,
+                "mode": 21
+            },
+            "scenes": [
+                {
+                    "active": true,
+                    "name": "My Color Mix",
+                    "mode": "BREATH",
+                    "colors": [
+                        "RED",
+                        "BLUE",
+                        "GREEN",
+                        "PURPLE",
+                        "ORANGE",
+                        "YELLOW",
+                        "CYAN"
+                    ]
+                }
+            ]
+        }
+      ],
+      "platform": "StarProjector"
+    }
+  ]
+}

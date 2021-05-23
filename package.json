@@ -1,0 +1,61 @@
+{
+  "name": "homebridge-star-projector",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for controlling tuya/smartlife based star projectors",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SeydX/homebridge-star-projector.git"
+  },
+  "funding": [
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/seydx"
+    },
+    {
+      "type": "kofi",
+      "url": "https://ko-fi.com/seydx"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/seydx"
+    }
+  ],
+  "scripts": {
+    "lint": "eslint --fix ."
+  },
+  "author": "SeydX (https://github.com/SeydX/homebridge-star-projector)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SeydX/homebridge-star-projector/issues"
+  },
+  "homepage": "https://github.com/SeydX/homebridge-star-projector#readme",
+  "keywords": [
+    "star",
+    "projector",
+    "tuya",
+    "smartlife",
+    "homebridge-plugin",
+    "homebridge",
+    "plugin",
+    "tuya",
+    "smartlife"
+  ],
+  "engines": {
+    "node": ">=12.18.3",
+    "homebridge": "^1.1.6"
+  },
+  "dependencies": {
+    "tuyapi": "^7.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.14.3",
+    "@babel/eslint-parser": "7.14.3",
+    "@babel/eslint-plugin": "7.13.16",
+    "eslint": "^7.27.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.3",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "^2.3.0"
+  }
+}
