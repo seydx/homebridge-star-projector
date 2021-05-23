@@ -1,6 +1,6 @@
 {
   "name": "homebridge-star-projector",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Homebridge plugin for controlling tuya/smartlife based star projectors",
   "main": "index.js",
   "repository": {
