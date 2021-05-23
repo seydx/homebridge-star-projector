@@ -79,9 +79,9 @@ This plugin uses the great [TuyApi](https://github.com/codetheweb/tuyapi) module
 These "endpoints" are also called `dps`. The plugin uses the following (default) endpoints/dps:
 
 * 20  = Power State (true/false)
-* 21  = Mode ('white', 'color', 'scene')
+* 21  = Mode ('white', 'colour', 'scene')
 * 22  = Laser Brightness (10 - 1000)
-* 24  = Color (HSB)
+* 24  = Color (HSB/V)
 * 25  = Scene
 * 26  = Countdown (Seconds) (currently not implemented)
 * 101 = Star Rotation Speed (10 - 1000)
