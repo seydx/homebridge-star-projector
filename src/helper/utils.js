@@ -405,6 +405,7 @@ const lookupTable = new Map([
   [500, [64.1, 28.3]],
 ]);
 
+//https://github.com/homebridge/HAP-NodeJS/blob/master/src/lib/util/color-utils.ts
 exports.colorTemperatureToHueAndSaturation = (colorTemperature, roundResults) => {
   roundResults = true;
 
@@ -428,6 +429,7 @@ exports.colorTemperatureToHueAndSaturation = (colorTemperature, roundResults) =>
   };
 };
 
+//https://github.com/iRayanKhan/homebridge-tuya/blob/031602d7c2a806716b9a67c1c993590e101ccb71/lib/BaseAccessory.js#L151
 exports.convertColorFromHomeKitToTuya = (obj) => {
   return (
     obj.hue.toString(16).padStart(4, '0') +
@@ -436,6 +438,7 @@ exports.convertColorFromHomeKitToTuya = (obj) => {
   );
 };
 
+//https://github.com/iRayanKhan/homebridge-tuya/blob/031602d7c2a806716b9a67c1c993590e101ccb71/lib/BaseAccessory.js#L195
 exports.convertColorFromTuyaToHomeKit = (value) => {
   const [, hue, saturation, brightness] = (value || '000003e803e8').match(
     /^([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})$/i

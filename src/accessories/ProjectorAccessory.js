@@ -112,39 +112,41 @@ class ProjectorAccessory {
       this.tuya.on(event, (data) => {
         Logger.debug(`Data received: ${JSON.stringify(data)}`);
 
-        //power state
-        if (data.dps[this.dps.powerState] !== undefined) {
-          this.handlePowerState(data.dps[this.dps.powerState]);
-        }
+        if (data && data.dps) {
+          //power state
+          if (data.dps[this.dps.powerState] !== undefined) {
+            this.handlePowerState(data.dps[this.dps.powerState]);
+          }
 
-        //mode
-        if (data.dps[this.dps.mode] !== undefined) {
-          this.handleCurrentMode(data.dps[this.dps.mode]);
-        }
+          //mode
+          if (data.dps[this.dps.mode] !== undefined) {
+            this.handleCurrentMode(data.dps[this.dps.mode]);
+          }
 
-        //laser brightness
-        if (data.dps[this.dps.laserBrightness] !== undefined) {
-          this.handleLaserBrightness(data.dps[this.dps.laserBrightness]);
-        }
+          //laser brightness
+          if (data.dps[this.dps.laserBrightness] !== undefined) {
+            this.handleLaserBrightness(data.dps[this.dps.laserBrightness]);
+          }
 
-        //color
-        if (data.dps[this.dps.color] !== undefined) {
-          this.handleColor(data.dps[this.dps.color]);
-        }
+          //color
+          if (data.dps[this.dps.color] !== undefined) {
+            this.handleColor(data.dps[this.dps.color]);
+          }
 
-        //rotation
-        if (data.dps[this.dps.rotation] !== undefined) {
-          this.handleRotation(data.dps[this.dps.rotation]);
-        }
+          //rotation
+          if (data.dps[this.dps.rotation] !== undefined) {
+            this.handleRotation(data.dps[this.dps.rotation]);
+          }
 
-        //laser state
-        if (data.dps[this.dps.laserState] !== undefined) {
-          this.handleLaserState(data.dps[this.dps.laserState]);
-        }
+          //laser state
+          if (data.dps[this.dps.laserState] !== undefined) {
+            this.handleLaserState(data.dps[this.dps.laserState]);
+          }
 
-        //color state
-        if (data.dps[this.dps.colorState] !== undefined) {
-          this.handleColorState(data.dps[this.dps.colorState]);
+          //color state
+          if (data.dps[this.dps.colorState] !== undefined) {
+            this.handleColorState(data.dps[this.dps.colorState]);
+          }
         }
       });
     });
