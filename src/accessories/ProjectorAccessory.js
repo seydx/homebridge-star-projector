@@ -4,20 +4,23 @@ const Logger = require('../helper/logger');
 const ColorUtils = require('../helper/utils');
 
 class ProjectorAccessory {
-  constructor(api, accessory, tuya) {
+  constructor(api, accessory, accessories, tuya) {
     this.api = api;
     this.accessory = accessory;
-    this.dps = accessory.context.config.dps;
+    this.accessories = accessories;
 
+    this.dps = accessory.context.config.dps;
     this.tuya = tuya;
-    this.getService();
+
+    this.createServices();
+    this.connect();
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
   // Services
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-  getService() {
+  createServices() {
     this.switchService = this.accessory.getServiceById(this.api.hap.Service.Switch, 'state');
     this.fanService = this.accessory.getServiceById(this.api.hap.Service.Fanv2, 'rotation');
     this.lightbulbLaserService = this.accessory.getServiceById(this.api.hap.Service.Lightbulb, 'laser');
@@ -29,26 +32,16 @@ class ProjectorAccessory {
       this.switchService = this.accessory.addService(this.api.hap.Service.Switch, 'State', 'state');
     }
 
-    this.switchService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.setPowerState.bind(this));
-
     //Fan Service
     if (this.accessory.context.config.starRotation) {
       if (!this.fanService) {
         Logger.info('Adding Fan service (rotation)', this.accessory.displayName);
         this.fanService = this.accessory.addService(this.api.hap.Service.Fanv2, 'Rotation', 'rotation');
-
         this.fanService.addCharacteristic(this.api.hap.Characteristic.RotationSpeed);
       }
-
       this.fanService.getCharacteristic(this.api.hap.Characteristic.RotationSpeed).setProps({
         minValue: 1,
       });
-
-      this.fanService.getCharacteristic(this.api.hap.Characteristic.Active).onSet(this.setRotationState.bind(this));
-
-      this.fanService
-        .getCharacteristic(this.api.hap.Characteristic.RotationSpeed)
-        .onSet(this.setRotationSpeed.bind(this));
     } else {
       if (this.fanService) {
         this.accessory.removeService(this.fanService);
@@ -65,7 +58,40 @@ class ProjectorAccessory {
         this.lightbulbColorService.addCharacteristic(this.api.hap.Characteristic.Hue);
         this.lightbulbColorService.addCharacteristic(this.api.hap.Characteristic.Saturation);
       }
+    } else {
+      if (this.lightbulbColorService) {
+        this.accessory.removeService(this.lightbulbColorService);
+      }
+    }
 
+    //Lightbulb Laser Service
+    if (this.accessory.context.config.laser) {
+      if (!this.lightbulbLaserService) {
+        Logger.info('Adding Lightbulb service (laser)', this.accessory.displayName);
+        this.lightbulbLaserService = this.accessory.addService(this.api.hap.Service.Lightbulb, 'Laser', 'laser');
+
+        this.lightbulbLaserService.addCharacteristic(this.api.hap.Characteristic.Brightness);
+      }
+    } else {
+      if (this.lightbulbLaserService) {
+        this.accessory.removeService(this.lightbulbLaserService);
+      }
+    }
+  }
+
+  getServices() {
+    this.switchService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.setPowerState.bind(this));
+
+    //Fan Service
+    if (this.accessory.context.config.starRotation) {
+      this.fanService.getCharacteristic(this.api.hap.Characteristic.Active).onSet(this.setRotationState.bind(this));
+      this.fanService
+        .getCharacteristic(this.api.hap.Characteristic.RotationSpeed)
+        .onSet(this.setRotationSpeed.bind(this));
+    }
+
+    //Lightbulb Color Service
+    if (this.accessory.context.config.color) {
       this.lightbulbColorService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.setColorState.bind(this));
       this.lightbulbColorService.getCharacteristic(this.api.hap.Characteristic.Hue).onSet((value) =>
         this.setColor({
@@ -81,32 +107,15 @@ class ProjectorAccessory {
           brightness: value,
         })
       );
-    } else {
-      if (this.lightbulbColorService) {
-        this.accessory.removeService(this.lightbulbColorService);
-      }
     }
 
     //Lightbulb Laser Service
     if (this.accessory.context.config.laser) {
-      if (!this.lightbulbLaserService) {
-        Logger.info('Adding Lightbulb service (laser)', this.accessory.displayName);
-        this.lightbulbLaserService = this.accessory.addService(this.api.hap.Service.Lightbulb, 'Laser', 'laser');
-
-        this.lightbulbLaserService.addCharacteristic(this.api.hap.Characteristic.Brightness);
-      }
-
       this.lightbulbLaserService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.setLaserState.bind(this));
       this.lightbulbLaserService
         .getCharacteristic(this.api.hap.Characteristic.Brightness)
         .onSet(this.setLaserBrightness.bind(this));
-    } else {
-      if (this.lightbulbLaserService) {
-        this.accessory.removeService(this.lightbulbLaserService);
-      }
     }
-
-    this.getStates();
   }
 
   getStates() {
@@ -156,25 +165,47 @@ class ProjectorAccessory {
     this.tuya.on('error', (error) => Logger.warn(error.message || error, this.accessory.displayName));
 
     this.tuya.on('disconnected', () => {
-      Logger.warn('Disconnected', this.accessory.displayName);
+      if (!this.disconnected) {
+        Logger.warn('Disconnected', this.accessory.displayName);
 
-      this.disconnected = true;
-      this.lastState = this.switchService.getCharacteristic(this.api.hap.Characteristic.On).value;
-      this.switchService.getCharacteristic(this.api.hap.Characteristic.On).updateValue(new Error('Not reachable!'));
-
-      this.reconnect();
+        this.disconnected = true;
+        this.setAccessoryReachability(false);
+        this.reconnect();
+      }
     });
 
     this.tuya.on('connected', () => {
       if (this.disconnected) {
         Logger.info('Connected', this.accessory.displayName);
         this.disconnected = false;
-        this.switchService.getCharacteristic(this.api.hap.Characteristic.On).updateValue(this.lastState);
+        this.setAccessoryReachability(true);
       }
     });
 
     //initial get
     this.tuya.get({ shema: true });
+  }
+
+  async connect() {
+    try {
+      await this.tuya.find();
+      await this.tuya.connect();
+
+      this.setAccessoryReachability(true);
+
+      Logger.info('Connected to Tuya API', this.accessory.displayName);
+
+      this.getServices();
+      this.getStates();
+    } catch (err) {
+      Logger.warn(
+        `An error occured during connecting to Tuya API: ${err.message || err} - Retry in 60s`,
+        this.accessory.displayName
+      );
+
+      this.setAccessoryReachability(false);
+      setTimeout(() => this.connect(), 60 * 1000);
+    }
   }
 
   async reconnect() {
@@ -187,9 +218,32 @@ class ProjectorAccessory {
       try {
         await this.tuya.connect();
       } catch (err) {
-        Logger.info(err.message || err, this.accessory.displayName);
         this.reconnectTimeout = setTimeout(this.reconnect.bind(this), 5000);
       }
+    }
+  }
+
+  setAccessoryReachability(reachable) {
+    const linkedSceneAccessories = this.accessories.filter(
+      (accessory) => accessory && accessory.context.config.linkedTo === this.accessory.displayName
+    );
+
+    if (reachable) {
+      this.switchService.getCharacteristic(this.api.hap.Characteristic.On).updateValue(false);
+      linkedSceneAccessories.forEach((accessory) =>
+        accessory
+          .getService(this.api.hap.Service.Switch)
+          .getCharacteristic(this.api.hap.Characteristic.On)
+          .updateValue(false)
+      );
+    } else {
+      this.switchService.getCharacteristic(this.api.hap.Characteristic.On).updateValue(new Error('Not reachable!'));
+      linkedSceneAccessories.forEach((accessory) =>
+        accessory
+          .getService(this.api.hap.Service.Switch)
+          .getCharacteristic(this.api.hap.Characteristic.On)
+          .updateValue(new Error('Not reachable!'))
+      );
     }
   }
 

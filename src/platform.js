@@ -60,8 +60,14 @@ function StarProjector(log, config, api) {
         if (this.devices.has(uuid)) {
           Logger.warn('Multiple devices are configured with this name. Duplicate device will be skipped.', device.name);
         } else {
-          device.type = 'light';
+          const tuya = new TuyAPI({
+            id: device.tuyaId,
+            key: device.tuyaKey,
+          });
 
+          this.projectors.set(device.name, tuya);
+
+          device.type = 'light';
           device.dps = {
             powerState: 20,
             mode: 21,
@@ -124,38 +130,11 @@ function StarProjector(log, config, api) {
     });
   }
 
-  this.api.on('didFinishLaunching', this.connect.bind(this));
+  this.api.on('didFinishLaunching', this.didFinishLaunching.bind(this));
 }
 
 StarProjector.prototype = {
-  connect: async function () {
-    for (const entry of this.devices.entries()) {
-      let device = entry[1];
-
-      if (!device.linkedTo) {
-        const tuya = new TuyAPI({
-          id: device.tuyaId,
-          key: device.tuyaKey,
-        });
-
-        try {
-          await tuya.find();
-          await tuya.connect();
-
-          Logger.info('Connected to Tuya API', device.name);
-        } catch (err) {
-          Logger.warn('An error occured during connecting to Tuya API', device.name);
-          Logger.error(err);
-        }
-
-        this.projectors.set(device.name, tuya);
-      }
-    }
-
-    this.finishLaunching();
-  },
-
-  finishLaunching: function () {
+  didFinishLaunching: function () {
     for (const entry of this.devices.entries()) {
       let uuid = entry[0];
       let device = entry[1];
@@ -166,18 +145,22 @@ StarProjector.prototype = {
         const accessory = new Accessory(device.name, uuid);
 
         Logger.info('Configuring accessory...', accessory.displayName);
-        this.accessories.push(accessory);
+        this.setupAccessory(accessory, device);
 
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+
+        this.accessories.push(accessory);
       }
     }
 
     this.accessories.forEach((accessory) => {
       const device = this.devices.get(accessory.UUID);
-      if (!device) {
-        this.removeAccessory(accessory);
-      } else {
-        this.setupAccessory(accessory, device);
+
+      try {
+        if (!device) this.removeAccessory(accessory);
+      } catch (err) {
+        Logger.info('It looks like the device has already been removed. Skip removing.');
+        Logger.debug(err);
       }
     });
   },
@@ -204,14 +187,20 @@ StarProjector.prototype = {
     const tuya = this.projectors.get(device.linkedTo || device.name);
 
     if (device.type === 'light') {
-      new ProjectorAccessory(this.api, accessory, tuya);
+      new ProjectorAccessory(this.api, accessory, this.accessories, tuya);
     } else if (device.type === 'scene') {
       new SceneAccessory(this.api, accessory, tuya);
     }
   },
 
   configureAccessory: async function (accessory) {
-    Logger.info('Configuring accessory...', accessory.displayName);
+    const device = this.devices.get(accessory.UUID);
+
+    if (device) {
+      Logger.info('Configuring accessory...', accessory.displayName);
+      this.setupAccessory(accessory, device);
+    }
+
     this.accessories.push(accessory);
   },
 

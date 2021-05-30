@@ -26,18 +26,6 @@ class SceneAccessory {
     }
 
     this.switchService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.setScene.bind(this));
-
-    this.tuya.on('disconnected', () => {
-      this.disconnected = true;
-      this.switchService.getCharacteristic(this.api.hap.Characteristic.On).updateValue(new Error('Not reachable!'));
-    });
-
-    this.tuya.on('connected', () => {
-      if (this.disconnected) {
-        this.disconnected = false;
-        this.switchService.getCharacteristic(this.api.hap.Characteristic.On).updateValue(false);
-      }
-    });
   }
 
   async setScene(state) {
