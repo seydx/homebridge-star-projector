@@ -44,6 +44,8 @@ class ProjectorAccessory {
         minValue: 1,
       });
 
+      this.fanService.getCharacteristic(this.api.hap.Characteristic.Active).onSet(this.setRotationState.bind(this));
+
       this.fanService
         .getCharacteristic(this.api.hap.Characteristic.RotationSpeed)
         .onSet(this.setRotationSpeed.bind(this));
@@ -333,7 +335,28 @@ class ProjectorAccessory {
     }
   }
 
-  async setRotationSpeed(value) {
+  async setRotationState(state) {
+    try {
+      const currentState = this.fanService.getCharacteristic(this.api.hap.Characteristic.Active).value;
+      if (state !== currentState && !this.rotationSpeedInProgress) {
+        if (this.rotationStateTimeout) {
+          clearTimeout(this.rotationStateTimeout);
+          this.rotationStateTimeout = null;
+        }
+
+        this.rotationStateTimeout = setTimeout(async () => {
+          await this.setRotationSpeed(state ? 100 : 1, true);
+        }, 500);
+      }
+    } catch (err) {
+      Logger.warn('An error occured during setting rotation state!', this.accessory.displayName);
+      Logger.error(err);
+    }
+  }
+
+  async setRotationSpeed(value, fromSwitch) {
+    this.rotationSpeedInProgress = true;
+
     try {
       await this.tuya.set({
         dps: this.dps.rotation,
@@ -342,14 +365,24 @@ class ProjectorAccessory {
 
       Logger.info(`Rotation Speed: ${value}`, this.accessory.displayName);
 
-      if (value < 2) {
-        this.fanService.getCharacteristic(this.api.hap.Characteristic.Active).updateValue(0);
-      } else {
-        this.fanService.getCharacteristic(this.api.hap.Characteristic.Active).updateValue(1);
+      if (!fromSwitch) {
+        if (value < 2) {
+          this.fanService.getCharacteristic(this.api.hap.Characteristic.Active).updateValue(0);
+        } else {
+          this.fanService.getCharacteristic(this.api.hap.Characteristic.Active).updateValue(1);
+        }
       }
     } catch (err) {
       Logger.warn('An error occured during setting rotation speed!', this.accessory.displayName);
       Logger.error(err);
+    } finally {
+      if (this.rotationSpeedTimeout) {
+        clearTimeout(this.rotationSpeedTimeout);
+        this.rotationSpeedTimeout = null;
+      }
+      this.rotationSpeedTimeout = setTimeout(() => {
+        this.rotationSpeedInProgress = false;
+      }, 600);
     }
   }
 }

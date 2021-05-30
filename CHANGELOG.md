@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.4 - 2021-05-30
+- Fix Rotation Switch
+
 ## v1.0.3 - 2021-05-25
 - Fix `data` event
 
