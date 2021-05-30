@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## v1.0.5 - 2021-05-30
 - Fix connection/reconnection attempt to Tuya API
 
 ## v1.0.4 - 2021-05-30
