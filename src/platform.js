@@ -60,70 +60,75 @@ function StarProjector(log, config, api) {
         if (this.devices.has(uuid)) {
           Logger.warn('Multiple devices are configured with this name. Duplicate device will be skipped.', device.name);
         } else {
-          const tuya = new TuyAPI({
-            id: device.tuyaId,
-            key: device.tuyaKey,
-          });
-
-          this.projectors.set(device.name, tuya);
-
-          device.type = 'light';
-          device.dps = {
-            powerState: 20,
-            mode: 21,
-            rotation: 101,
-            scene: 25,
-            colorState: 103,
-            color: 24,
-            laserState: 102,
-            laserBrightness: 22,
-            ...device.dps,
-          };
-
-          this.devices.set(uuid, device);
-
-          if (device.scenes) {
-            device.scenes.forEach((scene) => {
-              error = false;
-              let validColors = ['RED', 'GREEN', 'BLUE', 'ORANGE', 'YELLOW', 'PURPLE', 'CYAN'];
-              scene.colors = scene.colors && scene.colors.length ? scene.colors : false;
-
-              if (!scene.active) {
-                Logger.info('Scene not active. This scene will be skipped.', device.name);
-                error = true;
-              } else if (!scene.name) {
-                Logger.warn('One of the scenes has no name configured. This scene will be skipped.');
-                error = true;
-              } else if (!scene.colors || !scene.colors.every((color) => validColors.includes(color))) {
-                Logger.warn('One of the scenes has no or not supported color. This scene will be skipped.');
-                error = true;
-              }
-
-              if (!error) {
-                const uuid2 = UUIDGen.generate(scene.name);
-
-                if (this.devices.has(uuid2)) {
-                  Logger.warn(
-                    'Multiple devices are configured with this name. Duplicate device will be skipped.',
-                    scene.name
-                  );
-                } else {
-                  const validModes = ['FLASH', 'BREATH'];
-
-                  scene.mode = validModes.includes(scene.mode) ? scene.mode : 'STATIC';
-                  scene.rotation = scene.rotation > 0 && scene.rotation < 100 ? scene.rotation : 50;
-
-                  const sceneDevice = {
-                    ...scene,
-                    dps: device.dps,
-                    linkedTo: device.name,
-                    type: 'scene',
-                  };
-
-                  this.devices.set(uuid2, sceneDevice);
-                }
-              }
+          try {
+            const tuya = new TuyAPI({
+              id: device.tuyaId,
+              key: device.tuyaKey,
             });
+
+            this.projectors.set(device.name, tuya);
+
+            device.type = 'light';
+            device.dps = {
+              powerState: 20,
+              mode: 21,
+              rotation: 101,
+              scene: 25,
+              colorState: 103,
+              color: 24,
+              laserState: 102,
+              laserBrightness: 22,
+              ...device.dps,
+            };
+
+            this.devices.set(uuid, device);
+
+            if (device.scenes) {
+              device.scenes.forEach((scene) => {
+                error = false;
+                let validColors = ['RED', 'GREEN', 'BLUE', 'ORANGE', 'YELLOW', 'PURPLE', 'CYAN'];
+                scene.colors = scene.colors && scene.colors.length ? scene.colors : false;
+
+                if (!scene.active) {
+                  Logger.info('Scene not active. This scene will be skipped.', device.name);
+                  error = true;
+                } else if (!scene.name) {
+                  Logger.warn('One of the scenes has no name configured. This scene will be skipped.');
+                  error = true;
+                } else if (!scene.colors || !scene.colors.every((color) => validColors.includes(color))) {
+                  Logger.warn('One of the scenes has no or not supported color. This scene will be skipped.');
+                  error = true;
+                }
+
+                if (!error) {
+                  const uuid2 = UUIDGen.generate(scene.name);
+
+                  if (this.devices.has(uuid2)) {
+                    Logger.warn(
+                      'Multiple devices are configured with this name. Duplicate device will be skipped.',
+                      scene.name
+                    );
+                  } else {
+                    const validModes = ['FLASH', 'BREATH'];
+
+                    scene.mode = validModes.includes(scene.mode) ? scene.mode : 'STATIC';
+                    scene.rotation = scene.rotation > 0 && scene.rotation < 100 ? scene.rotation : 50;
+
+                    const sceneDevice = {
+                      ...scene,
+                      dps: device.dps,
+                      linkedTo: device.name,
+                      type: 'scene',
+                    };
+
+                    this.devices.set(uuid2, sceneDevice);
+                  }
+                }
+              });
+            }
+          } catch (err) {
+            Logger.warn('An error occured during setting up the device!', device.name);
+            Logger.error(err.message);
           }
         }
       }

@@ -177,6 +177,7 @@ class ProjectorAccessory {
     this.tuya.on('connected', () => {
       if (this.disconnected) {
         Logger.info('Connected', this.accessory.displayName);
+
         this.disconnected = false;
         this.setAccessoryReachability(true);
       }
@@ -191,10 +192,9 @@ class ProjectorAccessory {
       await this.tuya.find();
       await this.tuya.connect();
 
-      this.setAccessoryReachability(true);
-
       Logger.info('Connected to Tuya API', this.accessory.displayName);
 
+      this.setAccessoryReachability(true);
       this.getServices();
       this.getStates();
     } catch (err) {
