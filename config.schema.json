@@ -40,6 +40,12 @@
             "description": "Tuya Key / API Secret",
             "required": true
           },
+          "ip": {
+            "title": "IP",
+            "type": "string",
+            "description": "Device IP",
+            "required": false
+          },
           "manufacturer": {
             "name": "Manufacturer",
             "type": "string",
@@ -146,11 +152,15 @@
                   "oneOf": [
                     {
                       "title": "Flash",
-                      "enum": ["FLASH"]
+                      "enum": [
+                        "FLASH"
+                      ]
                     },
                     {
                       "title": "Breath",
-                      "enum": ["BREATH"]
+                      "enum": [
+                        "BREATH"
+                      ]
                     }
                   ],
                   "condition": {
@@ -176,31 +186,45 @@
                     "oneOf": [
                       {
                         "title": "Red",
-                        "enum": ["RED"]
+                        "enum": [
+                          "RED"
+                        ]
                       },
                       {
                         "title": "Blue",
-                        "enum": ["BLUE"]
+                        "enum": [
+                          "BLUE"
+                        ]
                       },
                       {
                         "title": "Green",
-                        "enum": ["GREEN"]
+                        "enum": [
+                          "GREEN"
+                        ]
                       },
                       {
                         "title": "Yellow",
-                        "enum": ["YELLOW"]
+                        "enum": [
+                          "YELLOW"
+                        ]
                       },
                       {
                         "title": "Orange",
-                        "enum": ["ORANGE"]
+                        "enum": [
+                          "ORANGE"
+                        ]
                       },
                       {
                         "title": "Purple",
-                        "enum": ["PURPLE"]
+                        "enum": [
+                          "PURPLE"
+                        ]
                       },
                       {
                         "title": "Cyan",
-                        "enum": ["CYAN"]
+                        "enum": [
+                          "CYAN"
+                        ]
                       }
                     ]
                   },
@@ -234,6 +258,7 @@
             "projectors[].name",
             "projectors[].tuyaId",
             "projectors[].tuyaKey",
+            "projectors[].ip",
             {
               "key": "projectors[]",
               "type": "section",
@@ -241,7 +266,11 @@
               "expandable": true,
               "expanded": false,
               "orderable": false,
-              "items": ["projectors[].manufacturer", "projectors[].model", "projectors[].serialNumber"]
+              "items": [
+                "projectors[].manufacturer",
+                "projectors[].model",
+                "projectors[].serialNumber"
+              ]
             },
             {
               "key": "projectors[]",
@@ -249,7 +278,11 @@
               "expandable": true,
               "expanded": false,
               "orderable": false,
-              "items": ["projectors[].color", "projectors[].laser", "projectors[].starRotation"]
+              "items": [
+                "projectors[].color",
+                "projectors[].laser",
+                "projectors[].starRotation"
+              ]
             },
             {
               "key": "projectors[].scenes",
@@ -274,7 +307,9 @@
                       "expanded": false,
                       "orderable": false,
                       "buttonText": "Add Color",
-                      "items": ["projectors[].scenes[].colors[]"]
+                      "items": [
+                        "projectors[].scenes[].colors[]"
+                      ]
                     }
                   ]
                 }
